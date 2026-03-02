@@ -1,0 +1,57 @@
+{
+  "title": "実践プロジェクトクイズ",
+  "difficulty": "medium",
+  "points": 200,
+  "questions": [
+    {
+      "questionType": "multiple_choice",
+      "questionText": "ReactアプリケーションでClaude Codeにプロジェクトを初期化してもらう際、最初に行うべきことは何ですか？",
+      "options": [
+        "プロジェクトディレクトリでClaude Codeを起動し、技術スタックを指定して初期化を依頼する",
+        "手動でpackage.jsonを作成してからClaude Codeを起動する",
+        "Claude Codeにプロジェクトディレクトリの作成だけ依頼し、残りは手動で行う",
+        "まずデプロイ環境を構築してからClaude Codeを使う"
+      ],
+      "correctAnswer": "プロジェクトディレクトリでClaude Codeを起動し、技術スタックを指定して初期化を依頼する",
+      "explanation": "Claude Codeはプロジェクトの初期化からセットアップまで一貫して行えます。プロジェクトディレクトリで起動し、使用したい技術スタック（React, TypeScript, Viteなど）を具体的に指定することで、適切なプロジェクト構成を自動的に作成してくれます。"
+    },
+    {
+      "questionType": "multiple_choice",
+      "questionText": "Claude CodeでAPI統合テストを作成する際に使用するライブラリとして適切なものはどれですか？",
+      "options": [
+        "supertest",
+        "Selenium",
+        "Cypress",
+        "Puppeteer"
+      ],
+      "correctAnswer": "supertest",
+      "explanation": "supertestはNode.jsのHTTPサーバーに対するテストを行うためのライブラリで、Express.jsなどのAPIエンドポイントの統合テストに最適です。Selenium、Cypress、PuppeteerはブラウザのE2Eテスト用のツールです。"
+    },
+    {
+      "questionType": "multiple_choice",
+      "questionText": "Claude Codeにリファクタリングを依頼する際の推奨手順として正しいものはどれですか？",
+      "options": [
+        "現状分析 → テスト確認 → 計画作成 → 段階的実施 → 最終確認",
+        "すべてのコードを一度に変更 → テスト実行",
+        "新しいファイルに書き直し → 古いファイルを削除",
+        "テストを無効化 → リファクタリング実施 → テスト再有効化"
+      ],
+      "correctAnswer": "現状分析 → テスト確認 → 計画作成 → 段階的実施 → 最終確認",
+      "explanation": "安全なリファクタリングでは、まず現状を分析し、既存テストが通ることを確認してから、計画を立てて段階的に変更を適用します。各ステップでテストを実行し、問題がないことを確認しながら進めることが重要です。"
+    },
+    {
+      "questionType": "true_false",
+      "questionText": "Claude Codeは、エラーメッセージとスタックトレースを伝えるだけで、バグの原因を分析し修正コードを提案できる。",
+      "options": ["正しい", "誤り"],
+      "correctAnswer": "正しい",
+      "explanation": "Claude Codeはエラーメッセージとスタックトレースから該当するファイルを読み込み、コードの文脈を理解した上でバグの原因を分析できます。さらに、修正コードを直接生成して適用することも可能です。"
+    },
+    {
+      "questionType": "true_false",
+      "questionText": "Zodを使ったバリデーションでは、リクエストデータの型チェックとTypeScriptの型定義を同時に行うことができる。",
+      "options": ["正しい", "誤り"],
+      "correctAnswer": "正しい",
+      "explanation": "Zodはランタイムのバリデーションライブラリですが、z.infer<typeof schema>を使うことで、バリデーションスキーマからTypeScriptの型を自動的に導出できます。これにより、バリデーションルールと型定義を一元管理でき、整合性を保つことができます。"
+    }
+  ]
+}

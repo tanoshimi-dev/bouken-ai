@@ -1,0 +1,216 @@
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import app from '../app.js';
+import { prisma } from '../lib/prisma.js';
+import { createTestUser, cleanupTestUser, authRequest, type TestContext } from './helpers.js';
+
+describe('E2E: 学習フロー', () => {
+  let ctx: TestContext;
+
+  // IDs resolved from seeded data
+  let moduleId: string;
+  let lessonId: string;
+  let quizId: string;
+  let quizQuestionIds: string[] = [];
+
+  beforeAll(async () => {
+    // Create test user
+    ctx = await createTestUser();
+
+    // Fetch seeded modules (sorted by number) to get real IDs
+    const firstModule = await prisma.module.findFirst({
+      where: { isPublished: true },
+      orderBy: { number: 'asc' },
+      include: {
+        lessons: {
+          where: { isPublished: true },
+          orderBy: { order: 'asc' },
+          take: 1,
+        },
+        quizzes: {
+          take: 1,
+          include: {
+            questions: {
+              orderBy: { order: 'asc' },
+            },
+          },
+        },
+      },
+    });
+
+    if (!firstModule) throw new Error('No seeded modules found. Run db:seed first.');
+    if (firstModule.lessons.length === 0) throw new Error('No seeded lessons found.');
+    if (firstModule.quizzes.length === 0) throw new Error('No seeded quizzes found.');
+
+    moduleId = firstModule.id;
+    lessonId = firstModule.lessons[0].id;
+    quizId = firstModule.quizzes[0].id;
+    quizQuestionIds = firstModule.quizzes[0].questions.map((q) => q.id);
+  });
+
+  afterAll(async () => {
+    await cleanupTestUser(ctx.userId);
+    await prisma.$disconnect();
+  });
+
+  // 1. Health check
+  it('GET /api/health → 200', async () => {
+    const res = await app.request('/api/health');
+    expect(res.status).toBe(200);
+
+    const body = await res.json();
+    expect(body.status).toBe('ok');
+    expect(body.timestamp).toBeDefined();
+  });
+
+  // 2. Unauthenticated access
+  it('GET /api/auth/me (no token) → 401', async () => {
+    const res = await app.request('/api/auth/me');
+    expect(res.status).toBe(401);
+  });
+
+  // 3. Authenticated user profile
+  it('GET /api/auth/me (with token) → 200', async () => {
+    const res = await authRequest('GET', '/api/auth/me', ctx.accessToken);
+    expect(res.status).toBe(200);
+
+    const { data } = await res.json();
+    expect(data.id).toBe(ctx.userId);
+    expect(data.name).toBeDefined();
+    expect(data.createdAt).toBeDefined();
+  });
+
+  // 4. List modules
+  it('GET /api/modules → 200, modules returned', async () => {
+    const res = await authRequest('GET', '/api/modules', ctx.accessToken);
+    expect(res.status).toBe(200);
+
+    const { data } = await res.json();
+    expect(Array.isArray(data)).toBe(true);
+    expect(data.length).toBeGreaterThanOrEqual(3);
+
+    // Verify module shape
+    const mod = data[0];
+    expect(mod).toHaveProperty('id');
+    expect(mod).toHaveProperty('number');
+    expect(mod).toHaveProperty('title');
+    expect(mod).toHaveProperty('totalLessons');
+  });
+
+  // 5. Module detail
+  it('GET /api/modules/:id → 200, lessons + quizzes', async () => {
+    const res = await authRequest('GET', `/api/modules/${moduleId}`, ctx.accessToken);
+    expect(res.status).toBe(200);
+
+    const { data } = await res.json();
+    expect(data.id).toBe(moduleId);
+    expect(Array.isArray(data.lessons)).toBe(true);
+    expect(data.lessons.length).toBeGreaterThan(0);
+    expect(Array.isArray(data.quizzes)).toBe(true);
+    expect(data.quizzes.length).toBeGreaterThan(0);
+  });
+
+  // 6. Lesson detail
+  it('GET /api/modules/:moduleId/lessons/:lessonId → 200, contentMd', async () => {
+    const res = await authRequest(
+      'GET',
+      `/api/modules/${moduleId}/lessons/${lessonId}`,
+      ctx.accessToken,
+    );
+    expect(res.status).toBe(200);
+
+    const { data } = await res.json();
+    expect(data.id).toBe(lessonId);
+    expect(typeof data.contentMd).toBe('string');
+    expect(data.contentMd.length).toBeGreaterThan(0);
+    expect(data.module).toBeDefined();
+  });
+
+  // 7. Complete lesson
+  it('POST /api/progress/lessons/:lessonId → 200, lessonCompleted', async () => {
+    const res = await authRequest(
+      'POST',
+      `/api/progress/lessons/${lessonId}`,
+      ctx.accessToken,
+    );
+    expect(res.status).toBe(200);
+
+    const { data } = await res.json();
+    expect(data.lessonCompleted).toBe(true);
+    expect(data.progress).toBeDefined();
+    expect(data.progress.completedLessons).toBeGreaterThanOrEqual(1);
+  });
+
+  // 8. Check overall progress
+  it('GET /api/progress → 200, completedLessons >= 1', async () => {
+    const res = await authRequest('GET', '/api/progress', ctx.accessToken);
+    expect(res.status).toBe(200);
+
+    const { data } = await res.json();
+    expect(data.completedLessons).toBeGreaterThanOrEqual(1);
+    expect(data.totalLessons).toBeGreaterThan(0);
+    expect(Array.isArray(data.modules)).toBe(true);
+  });
+
+  // 9. Check streak
+  it('GET /api/progress/streaks → 200, currentStreak >= 1', async () => {
+    const res = await authRequest('GET', '/api/progress/streaks', ctx.accessToken);
+    expect(res.status).toBe(200);
+
+    const { data } = await res.json();
+    expect(data.currentStreak).toBeGreaterThanOrEqual(1);
+    expect(data.longestStreak).toBeGreaterThanOrEqual(1);
+  });
+
+  // 10. Get quiz (no correctAnswer exposed)
+  it('GET /api/quizzes/:id → 200, questions without correctAnswer', async () => {
+    const res = await authRequest('GET', `/api/quizzes/${quizId}`, ctx.accessToken);
+    expect(res.status).toBe(200);
+
+    const { data } = await res.json();
+    expect(data.id).toBe(quizId);
+    expect(Array.isArray(data.questions)).toBe(true);
+    expect(data.questions.length).toBeGreaterThan(0);
+
+    // correctAnswer must NOT be included
+    for (const q of data.questions) {
+      expect(q).not.toHaveProperty('correctAnswer');
+      expect(q).toHaveProperty('questionText');
+      expect(q).toHaveProperty('options');
+    }
+  });
+
+  // 11. Submit quiz
+  it('POST /api/quizzes/:id/submit → 200, score/results', async () => {
+    // Fetch correct answers directly from DB to build valid answers
+    const questions = await prisma.quizQuestion.findMany({
+      where: { quizId },
+      orderBy: { order: 'asc' },
+    });
+
+    const answers = questions.map((q) => ({
+      questionId: q.id,
+      answer: q.correctAnswer,
+    }));
+
+    const res = await authRequest('POST', `/api/quizzes/${quizId}/submit`, ctx.accessToken, {
+      answers,
+      timeSpentSeconds: 60,
+    });
+    expect(res.status).toBe(200);
+
+    const { data } = await res.json();
+    expect(data.score).toBe(data.maxScore); // All correct
+    expect(data.percentage).toBe(100);
+    expect(Array.isArray(data.results)).toBe(true);
+    expect(data.results.length).toBe(questions.length);
+  });
+
+  // 12. Logout
+  it('POST /api/auth/logout → 200', async () => {
+    const res = await authRequest('POST', '/api/auth/logout', ctx.accessToken);
+    expect(res.status).toBe(200);
+
+    const body = await res.json();
+    expect(body.message).toBe('Logged out');
+  });
+});

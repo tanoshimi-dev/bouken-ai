@@ -1,22 +1,22 @@
-/**
- * Content Seeder — imports educational content from doc/contents/ into the database.
- *
- * Usage: npx tsx scripts/seed-content.ts
- *
- * Reads:
- *   - doc/contents/module-XX-*/README.md  → modules table
- *   - doc/contents/module-XX-*/lesson-*.md → lessons table
- *   - doc/contents/module-XX-*/quiz.json   → quizzes + quiz_questions tables
- *
- * Uses Prisma upsert for idempotent execution.
- */
+// Content Seeder — imports educational content from doc/contents/ into the database.
+//
+// Usage: npx tsx scripts/seed-content.ts
+//
+// Reads:
+//   - doc/contents/module-XX-<name>/README.md   -> modules table
+//   - doc/contents/module-XX-<name>/lesson-*.md  -> lessons table
+//   - doc/contents/module-XX-<name>/quiz.json    -> quizzes + quiz_questions tables
+//
+// Uses Prisma upsert for idempotent execution.
 
 import { PrismaClient } from '@prisma/client';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const prisma = new PrismaClient();
-const CONTENTS_DIR = path.resolve(import.meta.dirname, '../../doc/contents');
+const __dirname = import.meta.dirname ?? path.dirname(fileURLToPath(import.meta.url));
+const CONTENTS_DIR = path.resolve(__dirname, '../../doc/contents');
 
 interface ModuleMeta {
   number: number;

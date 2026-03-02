@@ -2,6 +2,7 @@ import type {
   ApiResponse,
   UserProfile,
   ModuleWithProgress,
+  ModuleDetail,
   LessonDetail,
   QuizDetail,
   QuizResult,
@@ -62,7 +63,7 @@ export class ApiClient {
     return this.request('/api/modules');
   }
 
-  async getModule(moduleId: string): Promise<ApiResponse<unknown>> {
+  async getModule(moduleId: string): Promise<ApiResponse<ModuleDetail>> {
     return this.request(`/api/modules/${moduleId}`);
   }
 

@@ -1,0 +1,57 @@
+{
+  "title": "プロンプトエンジニアリングクイズ",
+  "difficulty": "medium",
+  "points": 150,
+  "questions": [
+    {
+      "questionType": "multiple_choice",
+      "questionText": "効果的なプロンプトの基本構造に含まれない要素はどれですか？",
+      "options": [
+        "AIモデルのバージョン指定",
+        "目的（何を達成したいか）",
+        "コンテキスト（背景情報）",
+        "具体的な要件"
+      ],
+      "correctAnswer": "AIモデルのバージョン指定",
+      "explanation": "効果的なプロンプトの基本構造は「目的」「コンテキスト」「具体的な要件」「出力形式」で構成されます。AIモデルのバージョン指定はプロンプトの構造要素には含まれません。"
+    },
+    {
+      "questionType": "multiple_choice",
+      "questionText": "CLAUDE.mdファイルの主な目的は何ですか？",
+      "options": [
+        "プロジェクトの背景情報やルールをClaude Codeに伝える",
+        "Claude Codeのインストール手順を記述する",
+        "APIキーを安全に保存する",
+        "ビルドコマンドを自動実行する"
+      ],
+      "correctAnswer": "プロジェクトの背景情報やルールをClaude Codeに伝える",
+      "explanation": "CLAUDE.mdファイルは、プロジェクトの技術スタック、コーディング規約、ディレクトリ構造などの背景情報をClaude Codeに提供するために使用します。Claude Codeはこのファイルを自動的に読み込み、コンテキストとして活用します。"
+    },
+    {
+      "questionType": "multiple_choice",
+      "questionText": "「思考の連鎖（Chain of Thought）」テクニックの説明として正しいものはどれですか？",
+      "options": [
+        "Claude Codeに段階的に推論させることで、複雑な問題を正確に解決させる手法",
+        "複数のClaude Codeセッションを同時に起動して並列処理する手法",
+        "過去の会話履歴を連鎖的に参照させる手法",
+        "複数のプログラミング言語を連続して使用する手法"
+      ],
+      "correctAnswer": "Claude Codeに段階的に推論させることで、複雑な問題を正確に解決させる手法",
+      "explanation": "思考の連鎖（Chain of Thought）は、AIに段階的に考えさせるテクニックです。「まず分析して、次に改善案を考えて、最後に実装して」のように推論過程を明示的に指示することで、より正確で質の高い結果を得ることができます。"
+    },
+    {
+      "questionType": "true_false",
+      "questionText": "CLAUDE.mdファイルはプロジェクトのルートディレクトリにのみ配置できる。",
+      "options": ["正しい", "誤り"],
+      "correctAnswer": "誤り",
+      "explanation": "CLAUDE.mdファイルは、プロジェクトのルートディレクトリだけでなく、サブディレクトリやユーザーのホームディレクトリ（~/.claude/CLAUDE.md）にも配置できます。サブディレクトリに配置した場合、そのディレクトリに関するより具体的な情報を提供できます。"
+    },
+    {
+      "questionType": "true_false",
+      "questionText": "プロンプトは具体的であるほど、Claude Codeから期待通りの結果が得られやすい。",
+      "options": ["正しい", "誤り"],
+      "correctAnswer": "正しい",
+      "explanation": "具体的なプロンプトは、曖昧なプロンプトよりも正確な結果につながります。技術スタック、ファイルパス、要件、制約条件などを明確に指定することで、Claude Codeはより的確な応答を生成できます。"
+    }
+  ]
+}

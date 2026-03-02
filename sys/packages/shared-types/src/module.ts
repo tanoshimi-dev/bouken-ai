@@ -20,6 +20,11 @@ export interface Lesson {
   status: 'not_started' | 'in_progress' | 'completed';
 }
 
+export interface ModuleDetail extends Module {
+  lessons: Lesson[];
+  quizzes: { id: string; title: string; difficulty: 'easy' | 'medium' | 'hard'; points: number }[];
+}
+
 export interface LessonDetail {
   id: string;
   order: number;

@@ -1,0 +1,57 @@
+{
+  "title": "Claude Code 入門クイズ",
+  "difficulty": "easy",
+  "points": 100,
+  "questions": [
+    {
+      "questionType": "multiple_choice",
+      "questionText": "Claude Codeはどの環境で動作しますか？",
+      "options": [
+        "ターミナル（コマンドライン）",
+        "Webブラウザのみ",
+        "モバイルアプリ",
+        "デスクトップGUIアプリケーション"
+      ],
+      "correctAnswer": "ターミナル（コマンドライン）",
+      "explanation": "Claude Codeはターミナルネイティブのツールで、コマンドラインから直接起動して操作します。ブラウザやGUIアプリケーションではなく、開発者が普段使うターミナル環境で動作します。"
+    },
+    {
+      "questionType": "multiple_choice",
+      "questionText": "Claude Codeを使用するために必要なものはどれですか？",
+      "options": [
+        "Anthropic APIキー",
+        "OpenAI APIキー",
+        "Google Cloud アカウント",
+        "AWS アカウント"
+      ],
+      "correctAnswer": "Anthropic APIキー",
+      "explanation": "Claude CodeはAnthropic社が開発したツールであり、使用するにはAnthropic ConsoleからAPIキーを取得して設定する必要があります。"
+    },
+    {
+      "questionType": "multiple_choice",
+      "questionText": "プロジェクトの背景情報をClaude Codeに提供するために使用するファイルはどれですか？",
+      "options": [
+        "CLAUDE.md",
+        "README.md",
+        "CONFIG.json",
+        ".clauderc"
+      ],
+      "correctAnswer": "CLAUDE.md",
+      "explanation": "CLAUDE.mdファイルをプロジェクトのルートに配置することで、Claude Codeにプロジェクトの技術スタック、開発ルール、構造などの背景情報を提供できます。"
+    },
+    {
+      "questionType": "true_false",
+      "questionText": "Claude Codeは、プロジェクト内のファイルを直接読み書きすることができる。",
+      "options": ["正しい", "誤り"],
+      "correctAnswer": "正しい",
+      "explanation": "Claude Codeの大きな特徴の一つは、ファイルシステムへの直接アクセスが可能であることです。ファイルの読み込み、編集、新規作成を直接行うことができます。"
+    },
+    {
+      "questionType": "true_false",
+      "questionText": "Claude Codeを使うには、必ずWebブラウザが必要である。",
+      "options": ["正しい", "誤り"],
+      "correctAnswer": "誤り",
+      "explanation": "Claude Codeはターミナルで動作するため、Webブラウザは必要ありません。コマンドラインから直接起動し、すべての操作をターミナル上で行うことができます。"
+    }
+  ]
+}

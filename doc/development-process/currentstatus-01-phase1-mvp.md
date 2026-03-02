@@ -1,13 +1,13 @@
 # Phase 1: MVP基盤構築 — 進捗レポート
 
-**日付**: 2026-03-01
-**ステータス**: 進行中（約60%完了）
+**日付**: 2026-03-02
+**ステータス**: 完了（100%）
 
 ---
 
 ## 概要
 
-Phase 1 では、Learn Claude Code アプリのモノレポ基盤・バックエンドAPI・Web フロントエンド・OAuth認証を構築した。gengoka プロジェクト（`/Volumes/SSD-PSTU3A/work/dev/gengoka`）の `sys/` ディレクトリ構造を参考に、TypeScript モノレポとして再構成。
+Phase 1 では、Learn Claude Code アプリのモノレポ基盤・バックエンドAPI・Web フロントエンド・OAuth認証・学習コンテンツ・全ページのデータ連携を構築した。前回レポート（2026-03-01、約60%）から、残りの認証ガード・Markdownレンダラー・useApiフック・学習コンテンツ作成・7ページのUI実装を完了。さらに、バックエンド API の E2E テストを自動化し、全フローの動作確認を完了した。
 
 ---
 
@@ -58,7 +58,8 @@ Hono フレームワークでREST API を構築：
 
 | ファイル | 内容 |
 |---------|------|
-| `src/index.ts` | エントリーポイント、CORS、ロガー、エラーハンドラ |
+| `src/app.ts` | Hono app 定義（ミドルウェア・ルート登録） |
+| `src/index.ts` | エントリーポイント（`serve()` のみ） |
 | `src/lib/env.ts` | Zod による環境変数バリデーション |
 | `src/lib/prisma.ts` | PrismaClient シングルトン |
 | `src/lib/jwt.ts` | jose ベース JWT（access: 15分, refresh: 7日） |
@@ -82,28 +83,111 @@ Google と GitHub の OAuth ログインを実装・動作確認済み：
 - **JWT**: httpOnly Cookie でアクセストークン・リフレッシュトークンを管理
 - **トークンリフレッシュ**: POST /api/auth/refresh エンドポイント
 
-### 5. Web フロントエンド骨格（70%）
+### 5. 認証ガード（100%） ★ NEW
 
-Next.js 15 App Router で以下のページを作成：
+**新規作成**: `sys/frontend/user/web/src/middleware.ts`
 
-| ページ | 状態 |
-|--------|------|
-| `/` (ランディング) | 完了 |
-| `/login` | 完了（Google + GitHub ボタン） |
-| `/dashboard` | スキャフォールド（プレースホルダー） |
-| `/modules`, `/modules/[id]` | スキャフォールド |
-| `/modules/[id]/lessons/[id]` | スキャフォールド |
-| `/quiz/[id]`, `/quiz/[id]/results` | スキャフォールド |
-| `/profile` | スキャフォールド |
+- Next.js Middleware による認証ガード
+- `access_token` Cookie の存在チェック → 未認証時は `/login` へリダイレクト
+- 公開パス: `/`, `/login`, `/callback/*`
+- 静的アセット（`_next/static`, `_next/image`, favicon 等）は除外
 
-**レイアウト構成:**
-- Header（ユーザー名 + ログアウトボタン）
-- Sidebar（ダッシュボード、モジュール、プロフィール）
-- Redux Toolkit で認証状態管理
+### 6. Markdown レンダラー（100%） ★ NEW
 
-### 6. 共有パッケージ（100%）
+**新規作成**: `sys/frontend/user/web/src/components/content/MarkdownRenderer.tsx`
 
-- **shared-types**: User, Module, Lesson, Quiz, Progress, Common 型定義
+- `react-markdown` + `rehype-highlight` + `remark-gfm`
+- `highlight.js/styles/github-dark.css` でシンタックスハイライト
+- カスタムコンポーネント（headings, code blocks, tables, blockquote, links 等）
+- `@tailwindcss/typography` 不使用 — ReactMarkdown の `components` prop でスタイリング
+
+### 7. useApi フック + 型修正（100%） ★ NEW
+
+**新規作成**: `sys/frontend/user/web/src/hooks/useApi.ts`
+
+- 汎用 fetch-on-mount パターン（`data`, `error`, `loading` を返却）
+- キャンセル処理（アンマウント時のステート更新を防止）
+
+**型修正**:
+- `shared-types/module.ts` に `ModuleDetail` 型を追加（Module + lessons + quizzes）
+- `api-client/client.ts` の `getModule()` 戻り値を `ApiResponse<ModuleDetail>` に修正
+
+### 8. 学習コンテンツ（100%） ★ NEW
+
+`doc/contents/` に3モジュール・9レッスン・15クイズ問題を作成：
+
+| ディレクトリ | タイトル | レッスン | クイズ |
+|-------------|---------|---------|-------|
+| `module-01-introduction/` | Claude Code 入門 | 3本 | 5問（easy, 100pt） |
+| `module-02-prompt-engineering/` | プロンプトエンジニアリング基礎 | 3本 | 5問（medium, 150pt） |
+| `module-03-practical-projects/` | 実践プロジェクト | 3本 | 5問（medium, 200pt） |
+
+各モジュールの構成:
+- `README.md` — frontmatter（number, description, estimatedMinutes）+ タイトル
+- `lesson-1.md` ~ `lesson-3.md` — 日本語、コード例付き（各60行以上）
+- `quiz.json` — multiple_choice（3問）+ true_false（2問）
+
+`pnpm db:seed` で全コンテンツのDBインポートを確認済み。
+
+### 9. Web フロントエンド — 全ページ実装（100%） ★ NEW
+
+Next.js 15 App Router で以下の全ページがAPIデータ連携済み：
+
+| ページ | ファイル | API | 実装内容 |
+|--------|---------|-----|---------|
+| ダッシュボード | `DashboardContent.tsx` | `getProgress()`, `getStreaks()` | 進捗カード、ストリーク表示、現在のモジュール、モジュール別進捗 |
+| モジュール一覧 | `ModulesContent.tsx` | `getModules()` | カードグリッド、進捗バー、推定学習時間 |
+| モジュール詳細 | `ModuleDetailContent.tsx` | `getModule(id)` | レッスン一覧（ステータスアイコン）、クイズリンク |
+| レッスン | `LessonContent.tsx` | `getLesson()`, `completeLesson()` | MarkdownRenderer、完了ボタン、前後ナビゲーション |
+| クイズ | `QuizContent.tsx` | `getQuiz()`, `submitQuiz()` | 問題表示、回答選択、進捗バー、送信 |
+| クイズ結果 | `QuizResultsContent.tsx` | sessionStorage | スコア表示、問題別結果、解説、再挑戦リンク |
+| プロフィール | `ProfileContent.tsx` | `useAuth()`, `getProgress()`, `getStreaks()` | ユーザー情報、アバター、学習統計、ログアウト |
+
+**共通機能**:
+- 全ページにローディングスケルトン（animate-pulse）
+- エラー表示 + リカバリーリンク
+- パンくずナビゲーション（レッスンページ）
+
+### 10. バックエンド API E2E テスト（100%） ★ NEW
+
+Vitest + Hono `app.request()` による E2E テストを実装。実際の DB に対してフルフローを自動検証：
+
+**リファクタ**: `src/index.ts` から Hono app のセットアップを `src/app.ts` に分離し、テストから直接インポート可能に。
+
+**テスト基盤**:
+
+| ファイル | 役割 |
+|---------|------|
+| `src/__tests__/helpers.ts` | テストユーザー作成（Prisma）、JWT 発行（jose）、リクエストヘルパー |
+| `src/__tests__/e2e.test.ts` | 12 テストケースの E2E スイート |
+| `vitest.config.ts` | Vitest 設定（globals, timeout） |
+
+**テストケース（全12件 pass）**:
+
+| # | エンドポイント | 検証内容 |
+|---|---------------|---------|
+| 1 | `GET /api/health` | 200, `status: "ok"` |
+| 2 | `GET /api/auth/me` (トークンなし) | 401 |
+| 3 | `GET /api/auth/me` (トークンあり) | 200, ユーザープロフィール |
+| 4 | `GET /api/modules` | 200, モジュール一覧（3件以上） |
+| 5 | `GET /api/modules/:id` | 200, レッスン + クイズ含む |
+| 6 | `GET /api/modules/:moduleId/lessons/:lessonId` | 200, `contentMd` 含む |
+| 7 | `POST /api/progress/lessons/:lessonId` | 200, `lessonCompleted: true` |
+| 8 | `GET /api/progress` | 200, `completedLessons >= 1` |
+| 9 | `GET /api/progress/streaks` | 200, `currentStreak >= 1` |
+| 10 | `GET /api/quizzes/:id` | 200, `correctAnswer` が非公開 |
+| 11 | `POST /api/quizzes/:id/submit` | 200, スコア・結果 |
+| 12 | `POST /api/auth/logout` | 200 |
+
+**実行コマンド**:
+```bash
+cd sys
+pnpm --filter api test
+```
+
+### 11. 共有パッケージ（100%）
+
+- **shared-types**: User, Module, ModuleDetail, Lesson, LessonDetail, Quiz, QuizDetail, Progress, StreakInfo 型定義
 - **zod-schemas**: quizSubmissionSchema, lessonCompleteParamsSchema
 - **api-client**: ApiClient クラス（auth, modules, quizzes, progress メソッド、`credentials: 'include'`）
 
@@ -111,125 +195,132 @@ Next.js 15 App Router で以下のページを作成：
 
 ## 発生した問題と解決策
 
-### 問題 1: Prisma — DATABASE_URL が見つからない
+### 問題 1-8: 前回レポート参照
 
-**症状:** `prisma migrate dev` 実行時に "Environment variable not found: DATABASE_URL"
+前回（2026-03-01）のレポートに記載済み。Prisma DATABASE_URL、モノレポ自動インストール、API環境変数、Google OAuth API署名、redirect_uri_mismatch、クロスオリジン Cookie、Hono ルート順序、.js拡張子ビルドエラーの8件。
 
-**原因:** Prisma は schema.prisma と同じディレクトリの .env を読み込む。最初 `sys/prisma/` にスキーマを配置したが、.env は `sys/backend/api/` にあった。
+### 問題 9: seed-content.ts — ブロックコメント内の `*/` パターン ★ NEW
 
-**解決策:**
-1. `prisma/` ディレクトリを `backend/api/prisma/` に移動
-2. `.env` を `backend/api/` に配置（schema.prisma の親ディレクトリ）
+**症状:** `pnpm db:seed` 実行時に esbuild トランスパイルエラー `Expected ";" but found "→"`
 
-**試行錯誤:**
-- dotenv-cli → pnpm ワークスペースでコマンド解決できず
-- `--dotenv-path` フラグ → インストール済みバージョンで未サポート
+**原因:** JSDoc コメント内の `module-XX-*/README.md` の `*/` がブロックコメント終了として解釈された。
 
-### 問題 2: Prisma generate — モノレポでの自動インストール失敗
+**解決策:** `/** */` ブロックコメントを `//` 行コメントに変更し、パスの `*` を `<name>` に置換。
 
-**症状:** `prisma generate` で "Command failed: pnpm add prisma@6.19.2 -D --silent"
+### 問題 10: seed-content.ts — `import.meta.dirname` が undefined ★ NEW
 
-**原因:** Prisma の自動インストール機能が pnpm ワークスペース内で正常に動作しない。
+**症状:** `TypeError: The "paths[0]" argument must be of type string. Received undefined`
 
-**解決策:**
-- prisma と @prisma/client のバージョンを 6.19.2 に固定
-- `db:generate` スクリプトに `PRISMA_GENERATE_SKIP_AUTOINSTALL=true` を追加
-- スキーマを `backend/api/prisma/` に配置し、generator の `output` を削除（デフォルトの node_modules/.prisma/client を使用）
+**原因:** tsx が CJS モードでトランスパイルした際に `import.meta.dirname` が利用できなかった。
 
-### 問題 3: API サーバー — 環境変数が読み込まれない
-
-**症状:** Zod バリデーションエラー（DATABASE_URL, JWT_SECRET 等が undefined）
-
-**原因:** tsx は `.env` ファイルを自動読み込みしない。
-
-**解決策:** dev スクリプトを `tsx watch --env-file=.env src/index.ts` に変更。
-
-### 問題 4: Google OAuth — arctic v3 API の署名不一致
-
-**症状:** "Cannot read properties of undefined (reading 'length')" エラー
-
-**原因:** arctic v3 では `createAuthorizationURL(state, codeVerifier, scopes)` の形式が必要。最初はスコープ配列のみを渡していた。
-
-**解決策:**
+**解決策:** `fileURLToPath(import.meta.url)` によるフォールバックを追加：
 ```typescript
-// 修正前（誤り）
-const url = google.createAuthorizationURL(['openid', 'email', 'profile']);
-
-// 修正後（正しい）
-const state = generateState();
-const codeVerifier = generateCodeVerifier();
-const url = google.createAuthorizationURL(state, codeVerifier, ['openid', 'email', 'profile']);
+import { fileURLToPath } from 'node:url';
+const __dirname = import.meta.dirname ?? path.dirname(fileURLToPath(import.meta.url));
 ```
-
-### 問題 5: Google OAuth — redirect_uri_mismatch
-
-**症状:** Google のエラー画面 "redirect_uri_mismatch"
-
-**原因:** Google Cloud Console に登録されたリダイレクト URI が .env の設定と不一致。
-
-**解決策:** Google Cloud Console で `http://localhost:3000/api/auth/google/callback` を登録。
-
-### 問題 6: クロスオリジン Cookie 問題
-
-**症状:** ログイン後にログアウトボタンが表示されない。`/api/auth/me` のレスポンスが 401。
-
-**原因:** Cookie は port 4000 で設定されるが、フロントエンドは port 3000。`SameSite=Lax` により、フロントエンドからの fetch で Cookie が送信されない。
-
-**解決策:**
-1. Next.js の rewrites で `/api/*` を `localhost:4000/api/*` にプロキシ
-2. api-client の `baseUrl` を `''`（同一オリジン）に変更
-3. OAuth リダイレクト URI をすべて port 3000 経由に変更
-4. LoginForm の href を `/api/auth/:provider`（同一オリジン）に変更
-
-```typescript
-// next.config.ts
-async rewrites() {
-  return [{ source: '/api/:path*', destination: `${API_URL}/api/:path*` }];
-}
-```
-
-### 問題 7: Hono ルート順序 — /me が /:provider に一致
-
-**症状:** `/api/auth/me` にアクセスすると "Unsupported provider: me" エラー
-
-**原因:** Hono はルート登録順にマッチングする。`/:provider` ワイルドカードが `/me` より先に登録されていた。
-
-**解決策:** 具体的なルート（/me, /refresh, /logout）をワイルドカードルート（/:provider, /:provider/callback）の **前** に配置。
-
-### 問題 8: ビルドエラー — .js 拡張子の解決失敗
-
-**症状:** "Can't resolve './client.js'" エラー
-
-**原因:** Next.js がワークスペースパッケージを生 TypeScript としてインポートする際、`.js` 拡張子のファイルが見つからない。
-
-**解決策:** shared-types, zod-schemas, api-client の全インポートから `.js` 拡張子を削除。
 
 ---
 
-## 残作業（約40%）
+## 残作業
 
-### コンテンツ作成（未着手）
-- [ ] Module 1: Claude Code 入門（レッスン3-5本 + クイズ）
-- [ ] Module 2: プロンプトエンジニアリング基礎（レッスン3-5本 + クイズ）
-- [ ] Module 3: 実践プロジェクト（レッスン3-5本 + クイズ）
-- [ ] `doc/contents/` ディレクトリにMarkdown + quiz.json を配置
-- [ ] `seed-content.ts` でDBにインポート
+### 完了済み ★ NEW
+- [x] バックエンド API E2E テスト — 12テストケースが全 pass（認証・モジュール・レッスン・進捗・ストリーク・クイズ・ログアウト）
+- [x] `app.ts` 分離リファクタ — テストから Hono app を直接インポート可能に
 
-### Web UI データ連携（未着手）
-- [ ] ダッシュボードページに実データ表示（進捗、ストリーク）
-- [ ] モジュール一覧・詳細ページを API に接続
-- [ ] レッスンページに Markdown レンダラー統合
-- [ ] クイズページに回答送信・結果表示を実装
-- [ ] プロフィールページにユーザー情報表示
+### 軽微な改善（任意・Phase 2 以降）
+- [ ] コンテンツ内容の精査・校正
+- [ ] レスポンシブデザインの微調整
+- [ ] エラーハンドリングの統一性確認
+- [ ] フロントエンド E2E テスト（Playwright 等）
 
-### Markdown レンダラー（未着手）
-- [ ] react-markdown + rehype-highlight でレッスンコンテンツ表示
-- [ ] コードブロックのシンタックスハイライト
-- [ ] レスポンシブデザイン対応
+---
 
-### 認証ガード（未着手）
-- [ ] 未認証ユーザーを `/login` にリダイレクト
-- [ ] Next.js middleware による保護
+## アーキテクチャ全体像
+
+```
+┌─────────────────────────────────────────────────┐
+│  doc/contents/                                   │
+│  module-01-*/  module-02-*/  module-03-*/        │
+│  (README.md, lesson-*.md, quiz.json)             │
+└──────────────────┬──────────────────────────────┘
+                   │ pnpm db:seed
+                   ▼
+┌──────────────────────────────────────────────────┐
+│  PostgreSQL (Docker)                              │
+│  modules, lessons, quizzes, quiz_questions,       │
+│  users, oauth_accounts, user_progress,            │
+│  user_quiz_attempts, user_achievements,           │
+│  user_streaks                                     │
+└──────────────────┬──────────────────────────────┘
+                   │ Prisma ORM
+                   ▼
+┌──────────────────────────────────────────────────┐
+│  Backend API (Hono, port 4000)                    │
+│  /api/auth/*  /api/modules/*  /api/quizzes/*      │
+│  /api/progress/*                                  │
+└──────────────────┬──────────────────────────────┘
+                   │ Next.js rewrites (/api/* proxy)
+                   ▼
+┌──────────────────────────────────────────────────┐
+│  Frontend (Next.js 15, port 3000)                 │
+│  Middleware (auth guard)                          │
+│  Pages: dashboard, modules, lessons, quiz,        │
+│         quiz results, profile                     │
+│  Components: MarkdownRenderer, Header, Sidebar    │
+│  Hooks: useAuth, useApi                           │
+│  Store: Redux Toolkit (authSlice)                 │
+└──────────────────────────────────────────────────┘
+```
+
+---
+
+## ファイル変更サマリー（2026-03-02）
+
+### 新規作成
+
+| ファイル | 概要 |
+|---------|------|
+| `sys/frontend/user/web/src/middleware.ts` | Next.js 認証ガード |
+| `sys/frontend/user/web/src/components/content/MarkdownRenderer.tsx` | Markdownレンダラー |
+| `sys/frontend/user/web/src/hooks/useApi.ts` | 汎用API fetchフック |
+| `doc/contents/module-01-introduction/README.md` | Module 1 メタデータ |
+| `doc/contents/module-01-introduction/lesson-1.md` | Claude Codeとは |
+| `doc/contents/module-01-introduction/lesson-2.md` | 環境セットアップ |
+| `doc/contents/module-01-introduction/lesson-3.md` | 基本操作ガイド |
+| `doc/contents/module-01-introduction/quiz.json` | Module 1 クイズ（5問） |
+| `doc/contents/module-02-prompt-engineering/README.md` | Module 2 メタデータ |
+| `doc/contents/module-02-prompt-engineering/lesson-1.md` | 効果的なプロンプトの書き方 |
+| `doc/contents/module-02-prompt-engineering/lesson-2.md` | コンテキスト管理 |
+| `doc/contents/module-02-prompt-engineering/lesson-3.md` | 高度なプロンプトテクニック |
+| `doc/contents/module-02-prompt-engineering/quiz.json` | Module 2 クイズ（5問） |
+| `doc/contents/module-03-practical-projects/README.md` | Module 3 メタデータ |
+| `doc/contents/module-03-practical-projects/lesson-1.md` | Webアプリケーション開発 |
+| `doc/contents/module-03-practical-projects/lesson-2.md` | API開発とテスト |
+| `doc/contents/module-03-practical-projects/lesson-3.md` | デバッグとリファクタリング |
+| `doc/contents/module-03-practical-projects/quiz.json` | Module 3 クイズ（5問） |
+| `sys/backend/api/src/app.ts` | Hono app 定義（index.ts から分離） |
+| `sys/backend/api/vitest.config.ts` | Vitest 設定 |
+| `sys/backend/api/src/__tests__/helpers.ts` | E2E テストユーティリティ |
+| `sys/backend/api/src/__tests__/e2e.test.ts` | E2E テストスイート（12ケース） |
+| `doc/runbook/e2e-test.md` | E2E テスト実行手順書 |
+
+### 修正
+
+| ファイル | 変更内容 |
+|---------|---------|
+| `sys/packages/shared-types/src/module.ts` | `ModuleDetail` 型を追加 |
+| `sys/packages/shared-types/src/index.ts` | `ModuleDetail` エクスポート追加 |
+| `sys/packages/api-client/src/client.ts` | `getModule()` 戻り値を `ApiResponse<ModuleDetail>` に修正 |
+| `sys/scripts/seed-content.ts` | JSDocコメント修正、`import.meta.dirname` フォールバック追加 |
+| `sys/backend/api/src/index.ts` | app.ts から import して `serve()` のみに変更 |
+| `sys/backend/api/package.json` | vitest devDep 追加、test/test:watch スクリプト追加 |
+| `sys/frontend/user/web/src/app/(app)/dashboard/DashboardContent.tsx` | API連携実装 |
+| `sys/frontend/user/web/src/app/(app)/modules/ModulesContent.tsx` | API連携実装 |
+| `sys/frontend/user/web/src/app/(app)/modules/[moduleId]/ModuleDetailContent.tsx` | API連携実装 |
+| `sys/frontend/user/web/src/app/(app)/modules/[moduleId]/lessons/[lessonId]/LessonContent.tsx` | API連携実装 |
+| `sys/frontend/user/web/src/app/(app)/quiz/[quizId]/QuizContent.tsx` | API連携実装 |
+| `sys/frontend/user/web/src/app/(app)/quiz/[quizId]/results/QuizResultsContent.tsx` | API連携実装 |
+| `sys/frontend/user/web/src/app/(app)/profile/ProfileContent.tsx` | API連携実装 |
 
 ---
 
@@ -250,6 +341,7 @@ cd sys
 pnpm install
 docker compose up -d          # PostgreSQL + Adminer
 pnpm db:migrate               # マイグレーション実行
+pnpm db:seed                  # コンテンツインポート
 pnpm turbo dev                # API + Web 同時起動
 ```
 
@@ -257,6 +349,7 @@ pnpm turbo dev                # API + Web 同時起動
 
 ## 参考資料
 
-- 設計仕様書: `bouken.app/claudecode/doc/design.md`
-- 開発計画: `doc/development/01-phase1-mvp.md`
+- 設計仕様書: `doc/development/01-phase1-mvp.md`
+- コンテンツインポート仕様: `doc/spec/content-import.md`
+- 開発計画: `doc/development/00-overview.md`
 - 参考プロジェクト: `/Volumes/SSD-PSTU3A/work/dev/gengoka`

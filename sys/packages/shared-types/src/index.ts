@@ -1,5 +1,5 @@
 export type { User, UserProfile } from './user';
-export type { Module, ModuleWithProgress, Lesson, LessonDetail } from './module';
+export type { Module, ModuleWithProgress, ModuleDetail, Lesson, LessonDetail } from './module';
 export type {
   Quiz,
   QuizDetail,
