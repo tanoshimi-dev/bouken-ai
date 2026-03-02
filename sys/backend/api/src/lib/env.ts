@@ -44,6 +44,9 @@ const envSchema = z.object({
   APP_URL: z.string().default('http://localhost:3000'),
   API_URL: z.string().default('http://localhost:4000'),
 
+  // Mobile
+  MOBILE_SCHEME: z.string().default('learnclaudecode'),
+
   // Cookie
   COOKIE_DOMAIN: z.string().optional(), // e.g. '.claudecode.bouken.app' for production
 });

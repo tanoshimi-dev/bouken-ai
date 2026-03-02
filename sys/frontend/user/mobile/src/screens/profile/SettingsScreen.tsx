@@ -1,0 +1,165 @@
+import React, { useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { useAppSelector } from '@/hooks/useAppSelector';
+import { apiClient } from '@/config/api';
+import { authService } from '@/services/auth.service';
+import Card from '@/components/common/Card';
+import { colors } from '@/theme/colors';
+import { spacing, borderRadius } from '@/theme/spacing';
+import { typography } from '@/theme/typography';
+import { ENV } from '@/config/env';
+import type { OAuthProvider } from '@learn-claude-code/shared-types';
+
+const allProviders: { id: OAuthProvider; label: string; color: string }[] = [
+  { id: 'google', label: 'Google', color: colors.google },
+  { id: 'github', label: 'GitHub', color: colors.github },
+  { id: 'microsoft', label: 'Microsoft', color: colors.microsoft },
+  { id: 'apple', label: 'Apple', color: colors.apple },
+  { id: 'line', label: 'LINE', color: colors.line },
+];
+
+export default function SettingsScreen() {
+  const user = useAppSelector((state) => state.auth.user);
+  const linkedProviders = user?.providers ?? [];
+  const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
+
+  const handleLink = async (provider: OAuthProvider) => {
+    setLoadingProvider(provider);
+    try {
+      // Link flow uses the same InAppBrowser approach but with the link endpoint
+      const { InAppBrowser } = await import('react-native-inappbrowser-reborn');
+      const url = `${ENV.API_URL}/api/auth/link/${provider}?platform=mobile`;
+
+      if (await InAppBrowser.isAvailable()) {
+        await InAppBrowser.openAuth(url, `${ENV.MOBILE_SCHEME}://auth/callback`, {
+          ephemeralWebSession: true,
+          showTitle: false,
+          enableUrlBarHiding: true,
+          enableDefaultShare: false,
+        });
+      }
+    } catch {
+      Alert.alert('Error', 'Failed to link provider.');
+    } finally {
+      setLoadingProvider(null);
+    }
+  };
+
+  const handleUnlink = async (provider: OAuthProvider) => {
+    if (linkedProviders.length <= 1) {
+      Alert.alert('Cannot Unlink', 'You must have at least one linked provider.');
+      return;
+    }
+
+    Alert.alert('Unlink Provider', `Are you sure you want to unlink ${provider}?`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Unlink',
+        style: 'destructive',
+        onPress: async () => {
+          setLoadingProvider(provider);
+          try {
+            await apiClient.unlinkProvider(provider);
+            Alert.alert('Success', `${provider} has been unlinked.`);
+          } catch {
+            Alert.alert('Error', 'Failed to unlink provider.');
+          } finally {
+            setLoadingProvider(null);
+          }
+        },
+      },
+    ]);
+  };
+
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <Text style={styles.sectionTitle}>Linked Accounts</Text>
+      <Text style={styles.sectionDescription}>
+        Manage the sign-in providers linked to your account.
+      </Text>
+
+      {allProviders.map(({ id, label, color }) => {
+        const isLinked = linkedProviders.includes(id);
+        return (
+          <Card key={id} style={styles.providerCard}>
+            <View style={styles.providerRow}>
+              <View style={[styles.providerDot, { backgroundColor: color }]} />
+              <Text style={styles.providerName}>{label}</Text>
+              <TouchableOpacity
+                style={isLinked ? styles.unlinkButton : styles.linkButton}
+                onPress={() => (isLinked ? handleUnlink(id) : handleLink(id))}
+                disabled={loadingProvider !== null}
+              >
+                <Text style={isLinked ? styles.unlinkText : styles.linkText}>
+                  {loadingProvider === id ? '...' : isLinked ? 'Unlink' : 'Link'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </Card>
+        );
+      })}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.surface,
+  },
+  content: {
+    padding: spacing.md,
+    paddingBottom: spacing.xxl,
+  },
+  sectionTitle: {
+    ...typography.h2,
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
+  },
+  sectionDescription: {
+    ...typography.bodySmall,
+    color: colors.textSecondary,
+    marginBottom: spacing.lg,
+  },
+  providerCard: {
+    marginBottom: spacing.sm,
+  },
+  providerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  providerDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: spacing.sm + 4,
+  },
+  providerName: {
+    ...typography.body,
+    color: colors.textPrimary,
+    flex: 1,
+  },
+  linkButton: {
+    backgroundColor: colors.accent,
+    paddingVertical: spacing.xs + 2,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.sm,
+  },
+  linkText: {
+    ...typography.bodySmall,
+    color: colors.textInverse,
+    fontWeight: '600',
+  },
+  unlinkButton: {
+    borderWidth: 1,
+    borderColor: colors.error,
+    paddingVertical: spacing.xs + 2,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.sm,
+  },
+  unlinkText: {
+    ...typography.bodySmall,
+    color: colors.error,
+    fontWeight: '600',
+  },
+});

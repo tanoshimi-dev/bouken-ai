@@ -1,0 +1,28 @@
+# OSX
+.DS_Store
+
+# Xcode
+ios/build/
+ios/Pods/
+ios/*.xcworkspace/xcuserdata/
+ios/*.xcodeproj/xcuserdata/
+ios/DerivedData/
+
+# Android
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+
+# Metro
+.metro-health-check*
+
+# CocoaPods
+ios/Podfile.lock
+
+# React Native codegen
+ios/build/generated/
+android/app/src/main/java/com/learnclaudecode/newarchitecture/
+
+# Debug
+*.log

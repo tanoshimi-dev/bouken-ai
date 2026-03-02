@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "rnscreens_autolinked_build",
+		"source" : "/Volumes/SSD-PSTU3A/work/dev/bouken/claudecode/sys/frontend/user/mobile/node_modules/react-native-screens/android/src/main/jni"
+	}
+}

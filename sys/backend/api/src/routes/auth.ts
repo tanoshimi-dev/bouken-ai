@@ -30,7 +30,17 @@ authRoutes.get('/me', authMiddleware, async (c) => {
 
 // Refresh token
 authRoutes.post('/refresh', async (c) => {
-  const refreshToken = getCookie(c, 'refresh_token');
+  let refreshToken = getCookie(c, 'refresh_token');
+
+  // Also accept refresh_token from request body (for mobile clients)
+  if (!refreshToken) {
+    try {
+      const body = await c.req.json<{ refresh_token?: string }>();
+      refreshToken = body.refresh_token;
+    } catch {
+      // no body or invalid JSON
+    }
+  }
 
   if (!refreshToken) {
     throw new AppError(401, 'Refresh token is required');
@@ -51,7 +61,11 @@ authRoutes.post('/refresh', async (c) => {
     maxAge: 60 * 60 * 24 * 7,
   });
 
-  return c.json({ message: 'Token refreshed' });
+  return c.json({
+    message: 'Token refreshed',
+    accessToken,
+    refreshToken: newRefreshToken,
+  });
 });
 
 // Logout
@@ -88,6 +102,15 @@ authRoutes.post('/apple/callback', async (c) => {
   }
 
   const { accessToken, refreshToken } = await authService.handleCallback('apple', code);
+
+  // Check if this is a mobile OAuth flow
+  const oauthPlatform = getCookie(c, 'oauth_platform');
+  if (oauthPlatform === 'mobile') {
+    deleteCookie(c, 'oauth_platform', { path: '/' });
+    return c.redirect(
+      `${env.MOBILE_SCHEME}://auth/callback?access_token=${encodeURIComponent(accessToken)}&refresh_token=${encodeURIComponent(refreshToken)}`,
+    );
+  }
 
   setCookie(c, 'access_token', accessToken, {
     ...cookieDefaults(),
@@ -141,6 +164,7 @@ authRoutes.delete('/link/:provider', authMiddleware, async (c) => {
 // OAuth start — generate state/verifier, store in cookies, redirect to provider
 authRoutes.get('/:provider', async (c) => {
   const provider = c.req.param('provider');
+  const platform = c.req.query('platform');
   const { url, state, codeVerifier } = authService.createAuthorizationUrl(provider);
 
   const cookieOptions = {
@@ -153,6 +177,11 @@ authRoutes.get('/:provider', async (c) => {
 
   if (codeVerifier) {
     setCookie(c, 'oauth_code_verifier', codeVerifier, cookieOptions);
+  }
+
+  // Store platform for mobile deep link redirect in callback
+  if (platform === 'mobile') {
+    setCookie(c, 'oauth_platform', 'mobile', cookieOptions);
   }
 
   return c.redirect(url);
@@ -191,6 +220,15 @@ authRoutes.get('/:provider/callback', async (c) => {
     code,
     codeVerifier,
   );
+
+  // Check if this is a mobile OAuth flow
+  const oauthPlatform = getCookie(c, 'oauth_platform');
+  if (oauthPlatform === 'mobile') {
+    deleteCookie(c, 'oauth_platform', { path: '/' });
+    return c.redirect(
+      `${env.MOBILE_SCHEME}://auth/callback?access_token=${encodeURIComponent(accessToken)}&refresh_token=${encodeURIComponent(refreshToken)}`,
+    );
+  }
 
   setCookie(c, 'access_token', accessToken, {
     ...cookieDefaults(),
