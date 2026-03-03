@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useApi } from '@/hooks/useApi';
 import { apiClient } from '@/lib/api';
 import { MarkdownRenderer } from '@/components/content/MarkdownRenderer';
-import type { LessonDetail, NewAchievement } from '@learn-claude-code/shared-types';
+import type { LessonDetail, NewAchievement } from '@learn-ai/shared-types';
 import { showAchievementToasts } from '@/components/achievements/AchievementToast';
 
 export function LessonContent({

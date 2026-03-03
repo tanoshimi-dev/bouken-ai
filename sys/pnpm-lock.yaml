@@ -20,10 +20,10 @@ importers:
       '@hono/node-server':
         specifier: ^1.14.0
         version: 1.19.9(hono@4.12.3)
-      '@learn-claude-code/shared-types':
+      '@learn-ai/shared-types':
         specifier: workspace:*
         version: link:../../packages/shared-types
-      '@learn-claude-code/zod-schemas':
+      '@learn-ai/zod-schemas':
         specifier: workspace:*
         version: link:../../packages/zod-schemas
       '@prisma/client':
@@ -60,13 +60,13 @@ importers:
 
   frontend/user/mobile:
     dependencies:
-      '@learn-claude-code/api-client':
+      '@learn-ai/api-client':
         specifier: workspace:*
         version: link:../../../packages/api-client
-      '@learn-claude-code/shared-types':
+      '@learn-ai/shared-types':
         specifier: workspace:*
         version: link:../../../packages/shared-types
-      '@learn-claude-code/zod-schemas':
+      '@learn-ai/zod-schemas':
         specifier: workspace:*
         version: link:../../../packages/zod-schemas
       '@react-navigation/bottom-tabs':
@@ -160,10 +160,10 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.71.2(react@19.2.4))
-      '@learn-claude-code/api-client':
+      '@learn-ai/api-client':
         specifier: workspace:*
         version: link:../../../packages/api-client
-      '@learn-claude-code/shared-types':
+      '@learn-ai/shared-types':
         specifier: workspace:*
         version: link:../../../packages/shared-types
       '@monaco-editor/react':
@@ -278,7 +278,7 @@ importers:
 
   packages/api-client:
     dependencies:
-      '@learn-claude-code/shared-types':
+      '@learn-ai/shared-types':
         specifier: workspace:*
         version: link:../shared-types
     devDependencies:

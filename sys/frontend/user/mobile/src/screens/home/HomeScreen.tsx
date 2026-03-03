@@ -10,7 +10,7 @@ import ProgressBar from '@/components/common/ProgressBar';
 import { colors } from '@/theme/colors';
 import { spacing } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
-import type { OverallProgress, StreakInfo } from '@learn-claude-code/shared-types';
+import type { OverallProgress, StreakInfo } from '@learn-ai/shared-types';
 
 export default function HomeScreen() {
   const user = useAppSelector((state) => state.auth.user);

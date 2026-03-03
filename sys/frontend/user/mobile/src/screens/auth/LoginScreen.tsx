@@ -8,7 +8,7 @@ import { apiClient } from '@/config/api';
 import { colors } from '@/theme/colors';
 import { spacing, borderRadius } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
-import type { OAuthProvider } from '@learn-claude-code/shared-types';
+import type { OAuthProvider } from '@learn-ai/shared-types';
 
 const providers: { id: OAuthProvider; label: string; color: string }[] = [
   { id: 'google', label: 'Continue with Google', color: colors.google },

@@ -1,6 +1,6 @@
 import { prisma } from '../lib/prisma.js';
 import { AppError } from '../middleware/error-handler.js';
-import type { PlaygroundTemplate } from '@learn-claude-code/shared-types';
+import type { PlaygroundTemplate } from '@learn-ai/shared-types';
 import { AchievementService } from './achievement.service.js';
 
 const MAX_SNIPPETS_PER_USER = 50;

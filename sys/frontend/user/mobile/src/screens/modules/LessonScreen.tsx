@@ -10,7 +10,7 @@ import MarkdownRenderer from '@/components/content/MarkdownRenderer';
 import { colors } from '@/theme/colors';
 import { spacing, borderRadius } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
-import type { LessonDetail } from '@learn-claude-code/shared-types';
+import type { LessonDetail } from '@learn-ai/shared-types';
 
 type Props = NativeStackScreenProps<ModuleStackParamList, 'Lesson'>;
 

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { useApi } from '@/hooks/useApi';
 import { apiClient } from '@/lib/api';
-import type { OverallProgress, StreakInfo } from '@learn-claude-code/shared-types';
+import type { OverallProgress, StreakInfo } from '@learn-ai/shared-types';
 import { AchievementGallery } from '@/components/achievements/AchievementGallery';
 
 export function ProfileContent() {

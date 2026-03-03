@@ -2,7 +2,7 @@ import * as Keychain from 'react-native-keychain';
 import { InAppBrowser } from 'react-native-inappbrowser-reborn';
 import { Linking } from 'react-native';
 import { ENV } from '@/config/env';
-import type { OAuthProvider } from '@learn-claude-code/shared-types';
+import type { OAuthProvider } from '@learn-ai/shared-types';
 
 const KEYCHAIN_SERVICE = 'learnclaudecode-auth';
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { apiClient } from '@/lib/api';
-import type { PlaygroundSnippet, SnippetType } from '@learn-claude-code/shared-types';
+import type { PlaygroundSnippet, SnippetType } from '@learn-ai/shared-types';
 
 interface SnippetManagerProps {
   type: SnippetType;

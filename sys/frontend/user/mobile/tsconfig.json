@@ -15,9 +15,9 @@
     "forceConsistentCasingInFileNames": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@learn-claude-code/shared-types": ["../../packages/shared-types/src"],
-      "@learn-claude-code/api-client": ["../../packages/api-client/src"],
-      "@learn-claude-code/zod-schemas": ["../../packages/zod-schemas/src"]
+      "@learn-ai/shared-types": ["../../packages/shared-types/src"],
+      "@learn-ai/api-client": ["../../packages/api-client/src"],
+      "@learn-ai/zod-schemas": ["../../packages/zod-schemas/src"]
     },
     "baseUrl": "."
   },

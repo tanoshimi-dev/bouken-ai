@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useApi } from '@/hooks/useApi';
 import { apiClient } from '@/lib/api';
 import { BadgeCard } from './BadgeCard';
-import type { AchievementProgress } from '@learn-claude-code/shared-types';
+import type { AchievementProgress } from '@learn-ai/shared-types';
 
 const CATEGORIES = [
   { key: 'all', label: 'すべて' },

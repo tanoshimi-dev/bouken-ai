@@ -1,6 +1,6 @@
 'use client';
 
-import type { AchievementProgress } from '@learn-claude-code/shared-types';
+import type { AchievementProgress } from '@learn-ai/shared-types';
 
 export function BadgeCard({ achievement }: { achievement: AchievementProgress }) {
   const { badge, earned, earnedAt, progress } = achievement;

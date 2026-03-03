@@ -1,5 +1,5 @@
 {
-  "name": "@learn-claude-code/zod-schemas",
+  "name": "@learn-ai/zod-schemas",
   "version": "0.1.0",
   "private": true,
   "type": "module",

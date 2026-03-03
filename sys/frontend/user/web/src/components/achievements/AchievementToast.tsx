@@ -1,5 +1,5 @@
 import { toast } from 'sonner';
-import type { NewAchievement } from '@learn-claude-code/shared-types';
+import type { NewAchievement } from '@learn-ai/shared-types';
 
 export function showAchievementToast(achievement: NewAchievement) {
   toast.success(`${achievement.badge.icon} ${achievement.badge.name}`, {

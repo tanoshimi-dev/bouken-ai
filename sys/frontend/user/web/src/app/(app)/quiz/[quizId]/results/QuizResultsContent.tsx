@@ -2,7 +2,7 @@
 
 import { use, useState, useEffect } from 'react';
 import Link from 'next/link';
-import type { QuizQuestion } from '@learn-claude-code/shared-types';
+import type { QuizQuestion } from '@learn-ai/shared-types';
 
 interface StoredQuizResult {
   score: number;

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useApi } from '@/hooks/useApi';
 import { useAuth } from '@/hooks/useAuth';
 import { apiClient } from '@/lib/api';
-import type { OverallProgress, StreakInfo, UserAchievement } from '@learn-claude-code/shared-types';
+import type { OverallProgress, StreakInfo, UserAchievement } from '@learn-ai/shared-types';
 
 export function DashboardContent() {
   const { user } = useAuth();

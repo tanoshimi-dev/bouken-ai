@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { UserProfile } from '@learn-claude-code/shared-types';
+import type { UserProfile } from '@learn-ai/shared-types';
 
 interface AuthState {
   user: UserProfile | null;

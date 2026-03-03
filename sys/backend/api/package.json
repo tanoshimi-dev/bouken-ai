@@ -23,8 +23,8 @@
     "hono": "^4.7.0",
     "jose": "^6.0.0",
     "zod": "^3.24.0",
-    "@learn-claude-code/shared-types": "workspace:*",
-    "@learn-claude-code/zod-schemas": "workspace:*"
+    "@learn-ai/shared-types": "workspace:*",
+    "@learn-ai/zod-schemas": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22",

@@ -8,7 +8,7 @@ import { colors } from '@/theme/colors';
 import { spacing, borderRadius } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
 import { ENV } from '@/config/env';
-import type { OAuthProvider } from '@learn-claude-code/shared-types';
+import type { OAuthProvider } from '@learn-ai/shared-types';
 
 const allProviders: { id: OAuthProvider; label: string; color: string }[] = [
   { id: 'google', label: 'Google', color: colors.google },

@@ -13,7 +13,7 @@ import type {
   PlaygroundTemplate,
   UserAchievement,
   AchievementProgress,
-} from '@learn-claude-code/shared-types';
+} from '@learn-ai/shared-types';
 
 export interface ApiClientConfig {
   baseUrl: string;

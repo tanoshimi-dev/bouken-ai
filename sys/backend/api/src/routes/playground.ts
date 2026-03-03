@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { authMiddleware } from '../middleware/auth.js';
 import { PlaygroundService } from '../services/playground.service.js';
-import { createSnippetSchema } from '@learn-claude-code/zod-schemas';
+import { createSnippetSchema } from '@learn-ai/zod-schemas';
 
 export const playgroundRoutes = new Hono();
 

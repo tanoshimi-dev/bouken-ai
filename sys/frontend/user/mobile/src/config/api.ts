@@ -1,4 +1,4 @@
-import { createApiClient, ApiError } from '@learn-claude-code/api-client';
+import { createApiClient, ApiError } from '@learn-ai/api-client';
 import { ENV } from './env';
 import { authService } from '@/services/auth.service';
 

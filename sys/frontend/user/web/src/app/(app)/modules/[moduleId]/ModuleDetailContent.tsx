@@ -4,7 +4,7 @@ import { use } from 'react';
 import Link from 'next/link';
 import { useApi } from '@/hooks/useApi';
 import { apiClient } from '@/lib/api';
-import type { ModuleDetail } from '@learn-claude-code/shared-types';
+import type { ModuleDetail } from '@learn-ai/shared-types';
 
 function StatusIcon({ status }: { status: string }) {
   switch (status) {

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useApi } from '@/hooks/useApi';
 import { apiClient } from '@/lib/api';
-import type { ModuleWithProgress } from '@learn-claude-code/shared-types';
+import type { ModuleWithProgress } from '@learn-ai/shared-types';
 
 export function ModulesContent() {
   const { data: modules, loading, error } = useApi<ModuleWithProgress[]>(() =>

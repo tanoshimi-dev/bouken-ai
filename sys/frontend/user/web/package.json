@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
-    "@learn-claude-code/api-client": "workspace:*",
-    "@learn-claude-code/shared-types": "workspace:*",
+    "@learn-ai/api-client": "workspace:*",
+    "@learn-ai/shared-types": "workspace:*",
     "@monaco-editor/react": "^4.7.0",
     "@reduxjs/toolkit": "^2.6.0",
     "class-variance-authority": "^0.7.1",

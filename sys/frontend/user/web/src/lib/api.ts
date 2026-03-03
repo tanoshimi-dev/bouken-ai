@@ -1,4 +1,4 @@
-import { createApiClient } from '@learn-claude-code/api-client';
+import { createApiClient } from '@learn-ai/api-client';
 
 // Direct API calls to the backend (Approach A)
 export const apiClient = createApiClient({

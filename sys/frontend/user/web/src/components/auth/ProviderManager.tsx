@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { apiClient } from '@/lib/api';
-import type { LinkedAccount } from '@learn-claude-code/shared-types';
+import type { LinkedAccount } from '@learn-ai/shared-types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 

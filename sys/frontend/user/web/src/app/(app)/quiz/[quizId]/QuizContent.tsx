@@ -4,7 +4,7 @@ import { use, useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useApi } from '@/hooks/useApi';
 import { apiClient } from '@/lib/api';
-import type { QuizDetail, QuizQuestion, NewAchievement } from '@learn-claude-code/shared-types';
+import type { QuizDetail, QuizQuestion, NewAchievement } from '@learn-ai/shared-types';
 import { showAchievementToasts } from '@/components/achievements/AchievementToast';
 
 function MultipleChoiceCard({

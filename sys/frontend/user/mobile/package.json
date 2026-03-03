@@ -10,9 +10,9 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@learn-claude-code/api-client": "workspace:*",
-    "@learn-claude-code/shared-types": "workspace:*",
-    "@learn-claude-code/zod-schemas": "workspace:*",
+    "@learn-ai/api-client": "workspace:*",
+    "@learn-ai/shared-types": "workspace:*",
+    "@learn-ai/zod-schemas": "workspace:*",
     "@react-navigation/bottom-tabs": "^7.3.3",
     "@react-navigation/native": "^7.1.4",
     "@react-navigation/native-stack": "^7.3.3",

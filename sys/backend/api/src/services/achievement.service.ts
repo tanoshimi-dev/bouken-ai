@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma.js';
-import type { Badge, UserAchievement, AchievementProgress, NewAchievement } from '@learn-claude-code/shared-types';
+import type { Badge, UserAchievement, AchievementProgress, NewAchievement } from '@learn-ai/shared-types';
 
 export const BADGES: Badge[] = [
   // Lesson badges

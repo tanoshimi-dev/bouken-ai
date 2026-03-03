@@ -10,7 +10,7 @@ import MultipleChoiceCard from '@/components/quiz/MultipleChoiceCard';
 import { colors } from '@/theme/colors';
 import { spacing, borderRadius } from '@/theme/spacing';
 import { typography } from '@/theme/typography';
-import type { QuizDetail } from '@learn-claude-code/shared-types';
+import type { QuizDetail } from '@learn-ai/shared-types';
 
 type Props = NativeStackScreenProps<ModuleStackParamList, 'Quiz'>;
 

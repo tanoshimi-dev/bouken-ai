@@ -1,5 +1,5 @@
 {
-  "name": "@learn-claude-code/api-client",
+  "name": "@learn-ai/api-client",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -11,7 +11,7 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@learn-claude-code/shared-types": "workspace:*"
+    "@learn-ai/shared-types": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5"
