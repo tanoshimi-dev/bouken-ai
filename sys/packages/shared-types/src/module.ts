@@ -1,4 +1,4 @@
-import type { ContentTypeSlug } from './content-type';
+import type { ContentTypeSlug } from './content-type.js';
 
 export interface Module {
   id: string;

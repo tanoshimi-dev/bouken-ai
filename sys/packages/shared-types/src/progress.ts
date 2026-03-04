@@ -1,4 +1,4 @@
-import type { ContentTypeSlug } from './content-type';
+import type { ContentTypeSlug } from './content-type.js';
 
 export interface UserProgress {
   status: 'not_started' | 'in_progress' | 'completed';

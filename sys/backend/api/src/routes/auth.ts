@@ -4,8 +4,9 @@ import { authMiddleware } from '../middleware/auth.js';
 import { AuthService } from '../services/auth.service.js';
 import { AppError } from '../middleware/error-handler.js';
 import { env } from '../lib/env.js';
+import type { AppEnv } from '../types/env.js';
 
-export const authRoutes = new Hono();
+export const authRoutes = new Hono<AppEnv>();
 
 const authService = new AuthService();
 

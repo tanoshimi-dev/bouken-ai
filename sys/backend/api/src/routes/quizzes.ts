@@ -1,8 +1,9 @@
 import { Hono } from 'hono';
 import { authMiddleware } from '../middleware/auth.js';
 import { QuizService } from '../services/quiz.service.js';
+import type { AppEnv } from '../types/env.js';
 
-export const quizRoutes = new Hono();
+export const quizRoutes = new Hono<AppEnv>();
 
 const quizService = new QuizService();
 

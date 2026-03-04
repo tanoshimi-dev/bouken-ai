@@ -2,14 +2,15 @@ import { Hono } from 'hono';
 import { authMiddleware } from '../middleware/auth.js';
 import { ModuleService } from '../services/module.service.js';
 import { isValidContentType } from '@learn-ai/shared-types';
+import type { AppEnv } from '../types/env.js';
 
-export const moduleRoutes = new Hono();
+export const moduleRoutes = new Hono<AppEnv>();
 
 const moduleService = new ModuleService();
 
 // Get all published modules (optionally filtered by contentType)
 moduleRoutes.get('/', authMiddleware, async (c) => {
-  const user = c.get('user') as { id: string };
+  const user = c.get('user');
   const contentType = c.req.query('contentType');
   if (contentType && !isValidContentType(contentType)) {
     return c.json({ error: 'Invalid content type' }, 400);

@@ -1,8 +1,9 @@
 import { Hono } from 'hono';
 import { authMiddleware } from '../middleware/auth.js';
 import { AchievementService } from '../services/achievement.service.js';
+import type { AppEnv } from '../types/env.js';
 
-export const achievementRoutes = new Hono();
+export const achievementRoutes = new Hono<AppEnv>();
 
 const achievementService = new AchievementService();
 

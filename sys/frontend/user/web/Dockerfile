@@ -6,13 +6,12 @@ WORKDIR /app
 # Stage 1: Install all dependencies
 # ---------------------------------------------------------------------------
 FROM base AS deps
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml .npmrc ./
 COPY backend/api/package.json backend/api/
 COPY packages/shared-types/package.json packages/shared-types/
 COPY packages/zod-schemas/package.json packages/zod-schemas/
 COPY packages/api-client/package.json packages/api-client/
 COPY frontend/user/web/package.json frontend/user/web/
-COPY frontend/user/mobile/package.json frontend/user/mobile/
 RUN pnpm install --frozen-lockfile
 
 # ---------------------------------------------------------------------------

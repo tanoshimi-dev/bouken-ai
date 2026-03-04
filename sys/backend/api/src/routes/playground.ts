@@ -2,8 +2,9 @@ import { Hono } from 'hono';
 import { authMiddleware } from '../middleware/auth.js';
 import { PlaygroundService } from '../services/playground.service.js';
 import { createSnippetSchema } from '@learn-ai/zod-schemas';
+import type { AppEnv } from '../types/env.js';
 
-export const playgroundRoutes = new Hono();
+export const playgroundRoutes = new Hono<AppEnv>();
 
 const playgroundService = new PlaygroundService();
 

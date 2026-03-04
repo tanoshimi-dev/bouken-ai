@@ -1,14 +1,15 @@
 import { Hono } from 'hono';
 import { authMiddleware } from '../middleware/auth.js';
 import { ProgressService } from '../services/progress.service.js';
+import type { AppEnv } from '../types/env.js';
 
-export const progressRoutes = new Hono();
+export const progressRoutes = new Hono<AppEnv>();
 
 const progressService = new ProgressService();
 
 // Get user's overall progress (optionally filtered by contentType)
 progressRoutes.get('/', authMiddleware, async (c) => {
-  const user = c.get('user') as { id: string };
+  const user = c.get('user');
   const contentType = c.req.query('contentType');
   const progress = await progressService.getOverallProgress(user.id, contentType);
   return c.json({ data: progress });
