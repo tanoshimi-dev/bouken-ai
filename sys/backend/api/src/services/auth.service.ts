@@ -42,16 +42,20 @@ function decodePemPrivateKey(pem: string): Uint8Array {
   return bytes;
 }
 
-const apple =
-  env.APPLE_CLIENT_ID && env.APPLE_TEAM_ID && env.APPLE_KEY_ID && env.APPLE_PRIVATE_KEY
-    ? new Apple(
-        env.APPLE_CLIENT_ID,
-        env.APPLE_TEAM_ID,
-        env.APPLE_KEY_ID,
-        decodePemPrivateKey(env.APPLE_PRIVATE_KEY),
-        env.APPLE_REDIRECT_URI,
-      )
-    : null;
+let apple: InstanceType<typeof Apple> | null = null;
+if (env.APPLE_CLIENT_ID && env.APPLE_TEAM_ID && env.APPLE_KEY_ID && env.APPLE_PRIVATE_KEY) {
+  try {
+    apple = new Apple(
+      env.APPLE_CLIENT_ID,
+      env.APPLE_TEAM_ID,
+      env.APPLE_KEY_ID,
+      decodePemPrivateKey(env.APPLE_PRIVATE_KEY),
+      env.APPLE_REDIRECT_URI,
+    );
+  } catch (e) {
+    console.warn('[Auth] Failed to initialize Apple provider (invalid APPLE_PRIVATE_KEY):', e);
+  }
+}
 
 const line =
   env.LINE_CLIENT_ID && env.LINE_CLIENT_SECRET
