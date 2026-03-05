@@ -27,13 +27,28 @@ const microsoft =
       )
     : null;
 
+function decodePemPrivateKey(pem: string): Uint8Array {
+  // Handle escaped newlines from env vars and strip PEM header/footer
+  const normalized = pem.replace(/\\n/g, '\n');
+  const base64 = normalized
+    .replace(/-----BEGIN PRIVATE KEY-----/, '')
+    .replace(/-----END PRIVATE KEY-----/, '')
+    .replace(/\s/g, '');
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return bytes;
+}
+
 const apple =
   env.APPLE_CLIENT_ID && env.APPLE_TEAM_ID && env.APPLE_KEY_ID && env.APPLE_PRIVATE_KEY
     ? new Apple(
         env.APPLE_CLIENT_ID,
         env.APPLE_TEAM_ID,
         env.APPLE_KEY_ID,
-        new TextEncoder().encode(env.APPLE_PRIVATE_KEY),
+        decodePemPrivateKey(env.APPLE_PRIVATE_KEY),
         env.APPLE_REDIRECT_URI,
       )
     : null;

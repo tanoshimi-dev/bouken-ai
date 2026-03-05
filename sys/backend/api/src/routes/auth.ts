@@ -139,6 +139,7 @@ authRoutes.get('/link/:provider', authMiddleware, async (c) => {
     ...cookieDefaults(),
     path: '/',
     maxAge: 60 * 10,
+    ...(provider === 'apple' ? { sameSite: 'None' as const, secure: true } : {}),
   };
 
   setCookie(c, 'oauth_state', state, cookieOptions);
@@ -168,10 +169,13 @@ authRoutes.get('/:provider', async (c) => {
   const platform = c.req.query('platform');
   const { url, state, codeVerifier } = authService.createAuthorizationUrl(provider);
 
+  // Apple uses response_mode=form_post (cross-site POST), so SameSite=Lax
+  // cookies won't be sent back. Use SameSite=None for Apple OAuth cookies.
   const cookieOptions = {
     ...cookieDefaults(),
     path: '/',
     maxAge: 60 * 10,
+    ...(provider === 'apple' ? { sameSite: 'None' as const, secure: true } : {}),
   };
 
   setCookie(c, 'oauth_state', state, cookieOptions);
