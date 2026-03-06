@@ -84,3 +84,9 @@ adminUpdateRoutes.post('/check', async (c) => {
   const results = await updateTrackerService.checkAllToolVersions();
   return c.json({ data: { results } });
 });
+
+// Seed tool tracking configs
+adminUpdateRoutes.post('/seed', async (c) => {
+  const result = await updateTrackerService.seedToolConfigs();
+  return c.json({ data: result }, 201);
+});

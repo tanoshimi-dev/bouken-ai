@@ -18,7 +18,21 @@ export class QuizService {
     });
   }
 
-  async getQuizDetail(quizId: string) {
+  async getQuizDetail(quizId: string): Promise<{
+    id: string;
+    title: string;
+    difficulty: string;
+    points: number;
+    module: { id: string; number: number; title: string } | null;
+    questions: {
+      id: string;
+      questionType: string;
+      questionText: string;
+      codeSnippet: string | null;
+      options: unknown;
+      order: number;
+    }[];
+  }> {
     const quiz = await prisma.quiz.findUnique({
       where: { id: quizId },
       include: {
@@ -57,7 +71,13 @@ export class QuizService {
     quizId: string,
     answers: { questionId: string; answer: unknown }[],
     timeSpentSeconds: number,
-  ) {
+  ): Promise<{
+    score: number;
+    maxScore: number;
+    percentage: number;
+    results: { questionId: string; correct: boolean; correctAnswer: unknown; explanation: string }[];
+    newAchievements: Awaited<ReturnType<AchievementService['checkAndAwardBadges']>>;
+  }> {
     const quiz = await prisma.quiz.findUnique({
       where: { id: quizId },
       include: {

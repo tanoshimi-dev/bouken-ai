@@ -211,7 +211,7 @@ export class UpdateTrackerService {
     changes: { type: string; description: string }[];
     breakingChanges: boolean;
     changelogUrl?: string;
-  }) {
+  }): Promise<{ id: string; toolSlug: string; version: string }> {
     const config = await prisma.toolTrackingConfig.findUnique({
       where: { toolSlug: data.toolSlug },
     });
@@ -414,6 +414,61 @@ export class UpdateTrackerService {
     items.sort((a, b) => (priorityOrder[a.priority] ?? 99) - (priorityOrder[b.priority] ?? 99));
 
     return items;
+  }
+
+  // ── Admin: Seed Tool Configs ─────────────────────────
+
+  async seedToolConfigs(): Promise<{ count: number; tools: string[] }> {
+    const configs = [
+      {
+        toolSlug: 'claude-code',
+        displayName: 'Claude Code',
+        currentContentVersion: '1.0.28',
+        checkSourceType: 'npm',
+        checkSourceIdentifier: '@anthropic-ai/claude-code',
+        changelogUrl: 'https://docs.anthropic.com/en/docs/claude-code/changelog',
+        documentationUrl: 'https://docs.anthropic.com/en/docs/claude-code',
+      },
+      {
+        toolSlug: 'codex',
+        displayName: 'Codex CLI',
+        currentContentVersion: '0.1.0',
+        checkSourceType: 'github_release',
+        checkSourceIdentifier: 'openai/codex',
+        changelogUrl: 'https://github.com/openai/codex/releases',
+        documentationUrl: 'https://github.com/openai/codex',
+      },
+      {
+        toolSlug: 'github-copilot',
+        displayName: 'GitHub Copilot',
+        currentContentVersion: '2026-02',
+        checkSourceType: 'rss',
+        checkSourceIdentifier: 'https://github.blog/changelog/label/copilot/feed/',
+        changelogUrl: 'https://docs.github.com/en/copilot/about-github-copilot/whats-new-in-github-copilot',
+        documentationUrl: 'https://docs.github.com/en/copilot',
+      },
+      {
+        toolSlug: 'gemini',
+        displayName: 'Gemini CLI',
+        currentContentVersion: '0.1.0',
+        checkSourceType: 'npm',
+        checkSourceIdentifier: '@anthropic-ai/claude-code',
+        changelogUrl: 'https://ai.google.dev/gemini-api/docs',
+        documentationUrl: 'https://ai.google.dev/gemini-api/docs',
+      },
+    ];
+
+    const results = [];
+    for (const config of configs) {
+      const result = await prisma.toolTrackingConfig.upsert({
+        where: { toolSlug: config.toolSlug },
+        update: config,
+        create: config,
+      });
+      results.push(result);
+    }
+
+    return { count: results.length, tools: results.map((r) => r.toolSlug) };
   }
 
   // ── Private Helpers ────────────────────────────────────
