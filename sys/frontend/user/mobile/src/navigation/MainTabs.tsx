@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import type { MainTabsParamList } from './types';
 import HomeStack from './HomeStack';
 import ModuleStack from './ModuleStack';
+import UpdateStack from './UpdateStack';
 import ProfileStack from './ProfileStack';
 import { colors } from '@/theme/colors';
 import { Text } from 'react-native';
@@ -13,6 +14,7 @@ function TabIcon({ label, focused }: { label: string; focused: boolean }) {
   const icons: Record<string, string> = {
     HomeTab: '🏠',
     ModulesTab: '📚',
+    UpdatesTab: '🔄',
     ProfileTab: '👤',
   };
   return (
@@ -36,6 +38,7 @@ export default function MainTabs() {
     >
       <Tab.Screen name="HomeTab" component={HomeStack} options={{ title: 'Home' }} />
       <Tab.Screen name="ModulesTab" component={ModuleStack} options={{ title: '学習' }} />
+      <Tab.Screen name="UpdatesTab" component={UpdateStack} options={{ title: 'Updates' }} />
       <Tab.Screen name="ProfileTab" component={ProfileStack} options={{ title: 'Profile' }} />
     </Tab.Navigator>
   );

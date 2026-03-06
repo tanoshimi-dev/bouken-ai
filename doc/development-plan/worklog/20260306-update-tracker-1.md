@@ -6,7 +6,7 @@
 
 ---
 
-## Progress: 9 / 11 steps complete
+## Progress: 10 / 11 steps complete
 
 | # | Step | Status |
 |---|------|--------|
@@ -19,7 +19,7 @@
 | 7 | Admin Management screen (Web) | Done |
 | 8 | Home Dashboard widget integration | Done |
 | 9 | Lesson View version tag | Done |
-| 10 | Mobile screens | Not started |
+| 10 | Mobile screens | Done |
 | 11 | Push notification on content update | Not started |
 
 ---
@@ -29,13 +29,11 @@
 - Prisma: 3 new models (`ToolTrackingConfig`, `ToolVersion`, `ContentUpdateImpact`) + migration applied
 - Shared packages: types, zod schemas, api-client methods all added
 - Backend: 4 public endpoints + 7 admin endpoints + version checker service (npm/GitHub)
-- Frontend: 4 pages (Freshness Overview, Tool Detail, Version Detail, Admin Management) + sidebar nav
-- Admin Management screen includes:
-  - Version registration form (tool selector, version, date, summary, breaking flag, changelog URL)
-  - Change list editor (add/remove entries with type selector)
-  - Module/lesson impact picker (checkbox tree)
-  - Pending updates queue table (priority, tool, version, lesson count, status)
-  - Manual version check trigger with results display
+- Frontend Web: 5 pages (Freshness Overview, Tool Detail, Version Detail, Admin Management) + sidebar nav + dashboard widget + lesson version tags
+- Frontend Mobile: 2 screens (FreshnessOverview, ToolDetail) + UpdateStack navigation + "Updates" bottom tab
+  - Horizontal swipe carousel for tool cards
+  - Version timeline with dots, change lists, affected lessons
+  - Status badges, priority indicators, breaking change tags
 - Infra: seed script + GitHub Actions cron for auto version checking
 
 ## Bugfixes
@@ -45,5 +43,4 @@
 
 ## Next steps
 
-1. **Mobile screens** — carousel tool cards, timeline, push notifications
-2. **Push notification** — notify users on content update completion
+1. **Push notification on content update** — notify users when affected modules are updated

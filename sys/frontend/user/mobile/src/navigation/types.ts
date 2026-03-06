@@ -38,10 +38,17 @@ export type ProfileStackParamList = {
   Settings: undefined;
 };
 
+// Update stack
+export type UpdateStackParamList = {
+  FreshnessOverview: undefined;
+  ToolDetail: { toolSlug: string };
+};
+
 // Main tabs
 export type MainTabsParamList = {
   HomeTab: NavigatorScreenParams<HomeStackParamList>;
   ModulesTab: NavigatorScreenParams<ModuleStackParamList>;
+  UpdatesTab: NavigatorScreenParams<UpdateStackParamList>;
   ProfileTab: NavigatorScreenParams<ProfileStackParamList>;
 };
 
